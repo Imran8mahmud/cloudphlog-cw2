@@ -32,9 +32,16 @@ jobs:
         REACT_APP_AI_CONNECTION_STRING: InstrumentationKey=343f1a48-8cda-40ad-834c-6063defed19c;IngestionEndpoint=https://spaincentral-0.in.applicationinsights.azure.com/;LiveEndpoint=https://spaincentral.livediagnostics.monitor.azure.com/;ApplicationId=b0017b8b-5f43-4534-801b-56df92367214
       run: npm run build
 
+    - name: Prepare deployment package
+      run: |
+        mkdir deploy
+        cp -r build deploy/
+        cp server.js deploy/
+        echo '{"name":"cloudphlog","version":"2.0.0","private":true,"dependencies":{"express":"^4.18.2"},"scripts":{"serve":"node server.js"}}' > deploy/package.json
+
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ env.AZURE_WEBAPP_NAME }}
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: .
+        package: ./deploy
